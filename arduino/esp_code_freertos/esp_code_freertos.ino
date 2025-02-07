@@ -12,21 +12,22 @@
 
 // Pin definitions for the entry IR sensor and servo motor
 #define ENTRY_SENSOR_PIN 4
-#define SERVO_PIN 16  
+#define SERVO_PIN 16
 
 // Wi-Fi credentials
-const char* ssid = "SOBRALNET";         // Wi-Fi SSID
-const char* password = "1984511330";    // Wi-Fi password
+const char *ssid = "SOBRALNET";      // Wi-Fi SSID
+const char *password = "1984511330"; // Wi-Fi password
 
 // Server details
-const char* serverUrl = "http://192.168.1.102:3000/api/data"; // Server URL
-const char* deviceId = "ESP32_01"; // Unique ID for this ESP8266
+const char *serverUrl = "http://myipadress:3000/api/data"; // Server URL
+const char *deviceId = "ESP32_01";                         // Unique ID for this ESP8266
 
 // Mutex for shared resources
 SemaphoreHandle_t xMutex = NULL;
 
 // Sensor data structure
-struct SensorData {
+struct SensorData
+{
     String space1;
     String space2;
     String space3;
@@ -39,18 +40,19 @@ SensorData sensorData;
 Servo myServo;
 
 // Task handles
-TaskHandle_t wifiTaskHandle   = NULL;
+TaskHandle_t wifiTaskHandle = NULL;
 TaskHandle_t sensorTaskHandle = NULL;
-TaskHandle_t httpTaskHandle   = NULL;
-TaskHandle_t servoTaskHandle  = NULL;   
+TaskHandle_t httpTaskHandle = NULL;
+TaskHandle_t servoTaskHandle = NULL;
 
 // Function prototypes
 void connectToWiFi();
-void readSensors(void* parameter);
-void sendDataToServer(void* parameter);
-void monitorEntrySensor(void* parameter); 
+void readSensors(void *parameter);
+void sendDataToServer(void *parameter);
+void monitorEntrySensor(void *parameter);
 
-void setup() {
+void setup()
+{
     // Initialize serial communication
     Serial.begin(115200);
 
@@ -69,9 +71,11 @@ void setup() {
 
     // Create a mutex for shared resources
     xMutex = xSemaphoreCreateMutex();
-    if (xMutex == NULL) {
+    if (xMutex == NULL)
+    {
         Serial.println("Failed to create mutex");
-        while (1); // Halt if mutex creation fails
+        while (1)
+            ; // Halt if mutex creation fails
     }
 
     // Connect to Wi-Fi
@@ -89,36 +93,40 @@ void setup() {
     );
 
     xTaskCreatePinnedToCore(
-        sendDataToServer,  // Task function
-        "HTTPTask",        // Task name
-        8192,              // Stack size
-        NULL,              // Task parameters
-        2,                 // Priority
-        &httpTaskHandle,   // Task handle
-        1                  // Core
+        sendDataToServer, // Task function
+        "HTTPTask",       // Task name
+        8192,             // Stack size
+        NULL,             // Task parameters
+        2,                // Priority
+        &httpTaskHandle,  // Task handle
+        1                 // Core
     );
 
     xTaskCreatePinnedToCore(
-        monitorEntrySensor,  // Task function
-        "ServoTask",         // Task name
-        4096,                // Stack size
-        NULL,                // Task parameters
-        1,                   // Priority
-        &servoTaskHandle,    // Task handle
-        1                    // Core
+        monitorEntrySensor, // Task function
+        "ServoTask",        // Task name
+        4096,               // Stack size
+        NULL,               // Task parameters
+        1,                  // Priority
+        &servoTaskHandle,   // Task handle
+        1                   // Core
     );
 }
 
-void loop() {
+void loop()
+{
     // FreeRTOS scheduler will handle task execution
     vTaskDelete(NULL);
 }
 
 // Task to read parking sensor data
-void readSensors(void* parameter) {
-    while (1) {
+void readSensors(void *parameter)
+{
+    while (1)
+    {
         // Take the mutex to access shared sensor data
-        if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) {
+        if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE)
+        {
             sensorData.space1 = digitalRead(IR_SENSOR_PIN1) == 0 ? "occupied" : "available";
             sensorData.space2 = digitalRead(IR_SENSOR_PIN2) == 0 ? "occupied" : "available";
             sensorData.space3 = digitalRead(IR_SENSOR_PIN3) == 0 ? "occupied" : "available";
@@ -130,11 +138,14 @@ void readSensors(void* parameter) {
 }
 
 // Task to send sensor data to the server
-void sendDataToServer(void* parameter) {
-    while (1) {
+void sendDataToServer(void *parameter)
+{
+    while (1)
+    {
         String jsonPayload;
         // Take the mutex to access shared sensor data
-        if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) {
+        if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE)
+        {
             // Prepare JSON payload
             jsonPayload = "{";
             jsonPayload += "\"device_id\": \"" + String(deviceId) + "\",";
@@ -147,23 +158,29 @@ void sendDataToServer(void* parameter) {
         }
 
         // Send HTTP POST request if Wi-Fi is connected
-        if (WiFi.status() == WL_CONNECTED) {
+        if (WiFi.status() == WL_CONNECTED)
+        {
             HTTPClient http;
             http.begin(serverUrl);
             http.addHeader("Content-Type", "application/json");
 
             int httpResponseCode = http.POST(jsonPayload);
-            if (httpResponseCode > 0) {
+            if (httpResponseCode > 0)
+            {
                 Serial.print("HTTP Response code: ");
                 Serial.println(httpResponseCode);
                 String response = http.getString();
                 Serial.println(response);
-            } else {
+            }
+            else
+            {
                 Serial.print("Error code: ");
                 Serial.println(httpResponseCode);
             }
             http.end();
-        } else {
+        }
+        else
+        {
             Serial.println("Wi-Fi disconnected");
         }
 
@@ -172,25 +189,31 @@ void sendDataToServer(void* parameter) {
 }
 
 // New task to monitor the entry IR sensor and control the servo motor
-void monitorEntrySensor(void* parameter) {
-    while (1) {
+void monitorEntrySensor(void *parameter)
+{
+    while (1)
+    {
         // Check if the entry sensor detects an object.
         // Sensor outputs LOW (0) when an object is detected.
-        if (digitalRead(ENTRY_SENSOR_PIN) == 0) {
+        if (digitalRead(ENTRY_SENSOR_PIN) == 0)
+        {
             bool parkingFull = false;
 
             // Take the mutex to safely check the parking spaces status
-            if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) {
+            if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE)
+            {
                 if (sensorData.space1 == "occupied" &&
                     sensorData.space2 == "occupied" &&
                     sensorData.space3 == "occupied" &&
-                    sensorData.space4 == "occupied") {
+                    sensorData.space4 == "occupied")
+                {
                     parkingFull = true;
                 }
                 xSemaphoreGive(xMutex);
             }
 
-            if (!parkingFull) {
+            if (!parkingFull)
+            {
                 Serial.println("Entry sensor triggered: Activating servo barrier.");
                 // Rotate servo to 180°
                 myServo.write(180);
@@ -198,12 +221,15 @@ void monitorEntrySensor(void* parameter) {
                 vTaskDelay(pdMS_TO_TICKS(5000));
                 // Return servo to 90°
                 myServo.write(90);
-            } else {
+            }
+            else
+            {
                 Serial.println("All parking spaces occupied. Servo will not activate.");
             }
 
             // Wait until the entry sensor is clear to avoid repeated triggering
-            while (digitalRead(ENTRY_SENSOR_PIN) == 0) {
+            while (digitalRead(ENTRY_SENSOR_PIN) == 0)
+            {
                 vTaskDelay(pdMS_TO_TICKS(100));
             }
         }
@@ -213,10 +239,12 @@ void monitorEntrySensor(void* parameter) {
 }
 
 // Function to connect to Wi-Fi
-void connectToWiFi() {
+void connectToWiFi()
+{
     Serial.print("Connecting to Wi-Fi");
     WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {
+    while (WiFi.status() != WL_CONNECTED)
+    {
         delay(500);
         Serial.print(".");
     }
