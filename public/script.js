@@ -23,14 +23,25 @@ function updateParkingUI(data) {
     spaces.forEach((space) => {
         const spaceElement = document.getElementById(space.id);
         const carImage = spaceElement.querySelector('.car-image');
+        const timerElement = spaceElement.querySelector('.timer');
 
         if (space.status === 'occupied') {
             spaceElement.style.backgroundColor = 'red';
             carImage.style.display = 'block';
+            timerElement.style.display = 'block';
             occupiedCount++;
+
+            // Start or update the timer
+            if (!spaceElement.entryTime) {
+                spaceElement.entryTime = new Date(); // Record entry time
+            }
+            const elapsedTime = Math.floor((new Date() - spaceElement.entryTime) / 1000 / 60); // in minutes
+            timerElement.textContent = `${elapsedTime} min`;
         } else {
             spaceElement.style.backgroundColor = 'green';
             carImage.style.display = 'none';
+            timerElement.style.display = 'none';
+            spaceElement.entryTime = null; // Reset entry time
         }
     });
 
@@ -41,7 +52,7 @@ function updateParkingUI(data) {
 }
 
 // Fetch parking data every 5 seconds
-setInterval(fetchParkingData, 5000);
+setInterval(fetchParkingData, 3000);
 
 // Initial fetch
 fetchParkingData();

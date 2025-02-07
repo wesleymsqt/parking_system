@@ -44,6 +44,13 @@ h1 {
     display: none; /* Hidden by default */
 }
 
+.timer {
+    font-size: 16px;
+    color: white;
+    display: none; /* Hidden by default */
+    margin-top: 10px;
+}
+
 .occupancy-rate {
     margin-top: 20px;
     font-size: 20px;
