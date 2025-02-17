@@ -1,3 +1,4 @@
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
@@ -9,8 +10,61 @@ body {
     margin: 0;
 }
 
-h1 {
-    color: #333;
+.container-img{
+    background-image: url('assets/img/img1.jpeg'); 
+    background-size: cover; /* Faz a imagem cobrir todo o container */
+    background-position: center; /* Centraliza a imagem */  
+}
+
+.container-1{
+    background-color: rgb(221, 221, 221);
+    color: black;
+    text-transform: uppercase;
+    
+    border: 3px solid #ccc; 
+    border-radius: 10px;
+    box-shadow: 0 5px 5px rgba(255, 255, 255, 0.884); 
+
+    margin-top: 0px;
+    margin-bottom: 40px;
+    padding: 30px;
+}
+
+.container-2{
+    background-color: rgb(221, 221, 221);
+    color: black;
+    text-transform: uppercase;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 20px;
+    font-weight: 900; /* ou use um número como 700 */
+    
+    text-align: center;
+    border: 3px solid #ccc; 
+    border-radius: 10px;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.884); 
+
+    margin-top: 0px;
+    margin-bottom: 30px;
+    padding: 15px;
+    height: 20px;
+}
+
+.container-3 {
+    background-image: url('assets/img/img2.jpeg'); 
+    background-size: cover; /* Faz a imagem cobrir todo o container */
+    background-position: center; /* Centraliza a imagem */
+
+    display: flex;
+    width: auto; /* Largura do container */
+    height: auto; /* Altura do container */  
+
+    border: 3px solid #ccc; 
+    border-radius: 10px;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.884); 
+     
+    padding: 60px; /* Espaceamento do container */
+    justify-content: center;
+    align-items: center;
 }
 
 .parking-container {
@@ -19,21 +73,25 @@ h1 {
     margin-top: 20px;
 }
 
+/* Cards do container principal */
 .parking-space {
-    width: 150px;
-    height: 200px;
-    border: 2px solid #333;
+    background-color: rgb(46, 175, 46); 
+    
+    width: 250px;
+    height: 300px;
+
+    border: 3px solid #ccc; 
     border-radius: 10px;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
-    background-color: green; /* Default color for available spaces */
 }
 
 .space-number {
-    font-size: 24px;
+    font-size: 50px;
     font-weight: bold;
     color: white;
 }
@@ -52,7 +110,21 @@ h1 {
 }
 
 .occupancy-rate {
-    margin-top: 20px;
-    font-size: 20px;
-    color: #333;
+    background-color: rgb(221, 221, 221);
+    color: rgb(71, 70, 70);
+    font-size: 9px;
+    font-style: italic;
+    text-transform: uppercase;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    border: 3px solid #ccc; 
+    border-radius: 10px;
+    box-shadow: 0 5px 5px rgba(255, 255, 255, 0.884); 
+
+    margin-top: 5px;
+    width: 150px;
+    height: 30px;
 }
