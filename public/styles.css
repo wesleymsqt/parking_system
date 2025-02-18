@@ -27,7 +27,7 @@ body {
 
     margin-top: 0px;
     margin-bottom: 40px;
-    padding: 30px;
+    padding: 15px;
 }
 
 .container-2{
@@ -62,7 +62,7 @@ body {
     border-radius: 10px;
     box-shadow: 0 5px 5px rgba(0, 0, 0, 0.884); 
      
-    padding: 60px; /* Espaceamento do container */
+    padding: 40px; /* Espaceamento do container */
     justify-content: center;
     align-items: center;
 }
@@ -112,7 +112,7 @@ body {
 .occupancy-rate {
     background-color: rgb(221, 221, 221);
     color: rgb(71, 70, 70);
-    font-size: 9px;
+    font-size: 13px;
     font-style: italic;
     text-transform: uppercase;
 
@@ -125,6 +125,6 @@ body {
     box-shadow: 0 5px 5px rgba(255, 255, 255, 0.884); 
 
     margin-top: 5px;
-    width: 150px;
-    height: 30px;
+    width: 200px;
+    height: 40px;
 }
