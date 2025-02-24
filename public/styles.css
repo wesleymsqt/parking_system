@@ -1,4 +1,3 @@
-
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
@@ -51,18 +50,18 @@ body {
 
 .container-3 {
     background-image: url('assets/img/img2.jpeg'); 
-    background-size: cover; /* Faz a imagem cobrir todo o container */
-    background-position: center; /* Centraliza a imagem */
+    background-size: cover; 
+    background-position: center; 
 
     display: flex;
-    width: auto; /* Largura do container */
-    height: auto; /* Altura do container */  
+    width: auto; 
+    height: auto; 
 
     border: 3px solid #ccc; 
     border-radius: 10px;
     box-shadow: 0 5px 5px rgba(0, 0, 0, 0.884); 
      
-    padding: 40px; /* Espaceamento do container */
+    padding: 40px; 
     justify-content: center;
     align-items: center;
 }
@@ -99,13 +98,13 @@ body {
 .car-image {
     width: 100px;
     height: auto;
-    display: none; /* Hidden by default */
+    display: none; 
 }
 
 .timer {
     font-size: 16px;
     color: white;
-    display: none; /* Hidden by default */
+    display: none; 
     margin-top: 10px;
 }
 

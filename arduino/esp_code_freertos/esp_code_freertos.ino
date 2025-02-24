@@ -4,28 +4,28 @@
 #include <freertos/task.h>
 #include <ESP32Servo.h>
 
-// Pin definitions for parking sensors
+// Definições de pinos para sensores de estacionamento
 #define IR_SENSOR_PIN1 19
 #define IR_SENSOR_PIN2 18
 #define IR_SENSOR_PIN3 5
 #define IR_SENSOR_PIN4 17
 
-// Pin definitions for the entry IR sensor and servo motor
+// Definições de pinos para o sensor IR de entrada e servo motor
 #define ENTRY_SENSOR_PIN 4
 #define SERVO_PIN 16
 
-// Wi-Fi credentials
+// Wi-Fi credenciais
 const char *ssid = "SOBRALNET";      // Wi-Fi SSID
 const char *password = "1984511330"; // Wi-Fi password
 
-// Server details
+// Server detalhes
 const char *serverUrl = "http://myipadress:3000/api/data"; // Server URL
 const char *deviceId = "ESP32_01";                         // Unique ID for this ESP8266
 
-// Mutex for shared resources
+// Mutex para recursos compartilhados
 SemaphoreHandle_t xMutex = NULL;
 
-// Sensor data structure
+// Estrutura de dados do sensor
 struct SensorData
 {
     String space1;
@@ -36,16 +36,14 @@ struct SensorData
 
 SensorData sensorData;
 
-// Create a Servo object
+// Crie um objeto Servo
 Servo myServo;
 
-// Task handles
 TaskHandle_t wifiTaskHandle = NULL;
 TaskHandle_t sensorTaskHandle = NULL;
 TaskHandle_t httpTaskHandle = NULL;
 TaskHandle_t servoTaskHandle = NULL;
 
-// Function prototypes
 void connectToWiFi();
 void readSensors(void *parameter);
 void sendDataToServer(void *parameter);
@@ -53,35 +51,34 @@ void monitorEntrySensor(void *parameter);
 
 void setup()
 {
-    // Initialize serial communication
+    // Inicializando comunicação serial
     Serial.begin(115200);
 
-    // Set up parking sensor pins as input
+    // Configurar pinos do sensor de estacionamento como entrada
     pinMode(IR_SENSOR_PIN1, INPUT);
     pinMode(IR_SENSOR_PIN2, INPUT);
     pinMode(IR_SENSOR_PIN3, INPUT);
     pinMode(IR_SENSOR_PIN4, INPUT);
 
-    // Set up the entry sensor pin
+    // Configurar o pino do sensor de entrada
     pinMode(ENTRY_SENSOR_PIN, INPUT);
 
-    // Attach the servo motor to its control pin and set its initial position to 90°
+    // Fixe o servo motor ao seu pino de controle e ajuste sua posição inicial para 90°
     myServo.attach(SERVO_PIN);
     myServo.write(90);
 
-    // Create a mutex for shared resources
     xMutex = xSemaphoreCreateMutex();
     if (xMutex == NULL)
     {
         Serial.println("Failed to create mutex");
         while (1)
-            ; // Halt if mutex creation fails
+            ; // Parar se a criação do mutex falhar
     }
 
-    // Connect to Wi-Fi
+    // Conectar ao Wi-Fi
     connectToWiFi();
 
-    // Create tasks
+    // Cria tasks
     xTaskCreatePinnedToCore(
         readSensors,       // Task function
         "SensorTask",      // Task name
@@ -93,38 +90,37 @@ void setup()
     );
 
     xTaskCreatePinnedToCore(
-        sendDataToServer, // Task function
-        "HTTPTask",       // Task name
-        8192,             // Stack size
-        NULL,             // Task parameters
-        2,                // Priority
-        &httpTaskHandle,  // Task handle
-        1                 // Core
+        sendDataToServer, 
+        "HTTPTask",       
+        8192,             
+        NULL,             
+        2,                
+        &httpTaskHandle,  
+        1                 
     );
 
     xTaskCreatePinnedToCore(
-        monitorEntrySensor, // Task function
-        "ServoTask",        // Task name
-        4096,               // Stack size
-        NULL,               // Task parameters
-        1,                  // Priority
-        &servoTaskHandle,   // Task handle
-        1                   // Core
+        monitorEntrySensor, 
+        "ServoTask",        
+        4096,               
+        NULL,               
+        1,                  
+        &servoTaskHandle,   
+        1                   
     );
 }
 
 void loop()
 {
-    // FreeRTOS scheduler will handle task execution
+    // O agendador FreeRTOS cuidará da execução de tarefas
     vTaskDelete(NULL);
 }
 
-// Task to read parking sensor data
+// Tarefa para ler dados do sensor de estacionamento
 void readSensors(void *parameter)
 {
     while (1)
     {
-        // Take the mutex to access shared sensor data
         if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE)
         {
             sensorData.space1 = digitalRead(IR_SENSOR_PIN1) == 0 ? "occupied" : "available";
@@ -133,11 +129,11 @@ void readSensors(void *parameter)
             sensorData.space4 = digitalRead(IR_SENSOR_PIN4) == 0 ? "occupied" : "available";
             xSemaphoreGive(xMutex);
         }
-        vTaskDelay(pdMS_TO_TICKS(1000)); // Delay for 1 second
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
-// Task to send sensor data to the server
+// Tarefa para enviar dados do sensor para o servidor
 void sendDataToServer(void *parameter)
 {
     while (1)
