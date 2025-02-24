@@ -11,11 +11,11 @@ Este projeto consiste em um **sistema de estacionamento inteligente** que monito
 
 ## 🚀 Funcionalidades
 - Detecção automática de veículos.
-- Atualização **em tempo real** do status das vagas.
+- Atualização em tempo real do status das vagas.
 - Interface web para monitoramento prático.
 
 ## Como Usar
-1️⃣ Carregar o código `.ino` no Arduino.
+1️⃣ Carregar o código .ino no Arduino.
 2️⃣ Conectar os sensores corretamente.
 3️⃣ Executar a interface web localmente para visualizar o status do estacionamento.
 
