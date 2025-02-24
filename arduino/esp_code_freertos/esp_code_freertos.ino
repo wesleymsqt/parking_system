@@ -139,10 +139,10 @@ void sendDataToServer(void *parameter)
     while (1)
     {
         String jsonPayload;
-        // Take the mutex to access shared sensor data
+        // Pegue o mutex para acessar dados de sensores compartilhados
         if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE)
         {
-            // Prepare JSON payload
+            // Preparar carga JSON
             jsonPayload = "{";
             jsonPayload += "\"device_id\": \"" + String(deviceId) + "\",";
             jsonPayload += "\"parking_space_01\": \"" + sensorData.space1 + "\",";
@@ -153,7 +153,7 @@ void sendDataToServer(void *parameter)
             xSemaphoreGive(xMutex);
         }
 
-        // Send HTTP POST request if Wi-Fi is connected
+        // Envia solicitação HTTP POST se o Wi-Fi estiver conectado
         if (WiFi.status() == WL_CONNECTED)
         {
             HTTPClient http;
@@ -180,22 +180,21 @@ void sendDataToServer(void *parameter)
             Serial.println("Wi-Fi disconnected");
         }
 
-        vTaskDelay(pdMS_TO_TICKS(2000)); // Delay for 2 seconds
+        vTaskDelay(pdMS_TO_TICKS(2000)); 
     }
 }
 
-// New task to monitor the entry IR sensor and control the servo motor
+// Nova tarefa para monitorar o sensor IR de entrada e controlar o servo motor
 void monitorEntrySensor(void *parameter)
 {
     while (1)
     {
-        // Check if the entry sensor detects an object.
-        // Sensor outputs LOW (0) when an object is detected.
+        // Verifique se o sensor de entrada detecta um objeto, O sensor emite LOW (0) quando um objeto é detectado.
         if (digitalRead(ENTRY_SENSOR_PIN) == 0)
         {
             bool parkingFull = false;
 
-            // Take the mutex to safely check the parking spaces status
+            // Use o mutex para verificar com segurança o status das vagas de estacionamento
             if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE)
             {
                 if (sensorData.space1 == "occupied" &&
@@ -211,11 +210,11 @@ void monitorEntrySensor(void *parameter)
             if (!parkingFull)
             {
                 Serial.println("Entry sensor triggered: Activating servo barrier.");
-                // Rotate servo to 180°
+                // Girar servo em 180°
                 myServo.write(180);
-                // Wait for 5 seconds
+                // Espere 5 segundos
                 vTaskDelay(pdMS_TO_TICKS(5000));
-                // Return servo to 90°
+                // Gire o servo em 90°
                 myServo.write(90);
             }
             else
@@ -223,18 +222,18 @@ void monitorEntrySensor(void *parameter)
                 Serial.println("All parking spaces occupied. Servo will not activate.");
             }
 
-            // Wait until the entry sensor is clear to avoid repeated triggering
+            // Aguarde até que o sensor de entrada esteja limpo para evitar disparos repetidos
             while (digitalRead(ENTRY_SENSOR_PIN) == 0)
             {
                 vTaskDelay(pdMS_TO_TICKS(100));
             }
         }
 
-        vTaskDelay(pdMS_TO_TICKS(100)); // Poll every 100 ms
+        vTaskDelay(pdMS_TO_TICKS(100)); // Pesquisa a cada 100 ms
     }
 }
 
-// Function to connect to Wi-Fi
+// Função para conectar ao Wi-Fi
 void connectToWiFi()
 {
     Serial.print("Connecting to Wi-Fi");
